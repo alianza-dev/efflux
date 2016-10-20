@@ -40,6 +40,7 @@ import com.biasedbit.efflux.participant.ParticipantOperation;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import com.biasedbit.efflux.participant.RtpParticipantInfo;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
@@ -204,7 +205,7 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
         if (this.running.get()) {
             return true;
         }
-
+        
         DatagramChannelFactory factory;
         if (this.useNio) {
             factory = new OioDatagramChannelFactory(Executors.newCachedThreadPool());

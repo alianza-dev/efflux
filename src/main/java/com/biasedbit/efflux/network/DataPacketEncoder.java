@@ -17,17 +17,16 @@
 package com.biasedbit.efflux.network;
 
 import com.biasedbit.efflux.packet.DataPacket;
-
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
 @ChannelHandler.Sharable
-public class DataPacketEncoder extends OneToOneEncoder {
+public class DataPacketEncoder extends MessageToByteEncoder<Object> {
 
     // constructors ---------------------------------------------------------------------------------------------------
 
@@ -40,19 +39,19 @@ public class DataPacketEncoder extends OneToOneEncoder {
         return InstanceHolder.INSTANCE;
     }
 
-    // OneToOneEncoder ------------------------------------------------------------------------------------------------
+    // MessageToByteEncoder -------------------------------------------------------------------------------------------
 
     @Override
-    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
         if (!(msg instanceof DataPacket)) {
-            return Unpooled.EMPTY_BUFFER;
+            return;
         }
 
         DataPacket packet = (DataPacket) msg;
         if (packet.getDataSize() == 0) {
-            return Unpooled.EMPTY_BUFFER;
+            return;
         }
-        return packet.encode();
+        out.writeBytes(packet.encode());
     }
 
     // private classes ------------------------------------------------------------------------------------------------
