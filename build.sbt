@@ -1,7 +1,7 @@
-name := "Template"
+name := "efflux"
 
 lazy val settings = Seq(
-  version := "0.0.0",
+  version := "0.4.0",
 
   scalaVersion := "2.11.8",
 
@@ -22,3 +22,7 @@ lazy val root = project.in(file("."))
     JavaAppPackaging,
     UniversalPlugin)
   .settings(settings: _*)
+  .settings(
+    sources in(Compile, doc) := Seq.empty,
+    publishArtifact in(Compile, packageDoc) := false
+  )
