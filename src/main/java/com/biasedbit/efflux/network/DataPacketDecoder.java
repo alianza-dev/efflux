@@ -18,10 +18,10 @@ package com.biasedbit.efflux.network;
 
 import com.biasedbit.efflux.logging.Logger;
 import com.biasedbit.efflux.packet.DataPacket;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
@@ -36,12 +36,12 @@ public class DataPacketDecoder extends OneToOneDecoder {
 
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-        if (!(msg instanceof ChannelBuffer)) {
+        if (!(msg instanceof ByteBuf)) {
             return null;
         }
 
         try {
-            return DataPacket.decode((ChannelBuffer) msg);
+            return DataPacket.decode((ByteBuf) msg);
         } catch (Exception e) {
             LOG.debug("Failed to decode RTP packet.", e);
             return null;

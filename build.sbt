@@ -8,8 +8,14 @@ lazy val settings = Seq(
   resolvers := Seq("Artifactory" at "http://lolhens.no-ip.org/artifactory/libs-release/"),
 
   libraryDependencies ++= Seq(
-    "org.jboss.netty" % "netty" % "3.2.2.Final",
-    "org.slf4j" % "slf4j-api" % "1.6.1"
+    "org.slf4j" % "slf4j-api" % "1.7.21",
+    "ch.qos.logback" % "logback-classic" % "1.1.7",
+    "io.netty" % "netty-all" % "4.0.42.Final",
+    "junit" % "junit" % "4.12"
+  ),
+
+  libraryDependencies in Test ++= Seq(
+
   ),
 
   mainClass in Compile := None,

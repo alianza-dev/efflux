@@ -19,15 +19,11 @@ package com.biasedbit.efflux.network;
 import com.biasedbit.efflux.logging.Logger;
 import com.biasedbit.efflux.packet.CompoundControlPacket;
 import com.biasedbit.efflux.packet.ControlPacket;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelDownstreamHandler;
-import org.jboss.netty.channel.ChannelEvent;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.MessageEvent;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 
+import java.nio.channels.Channels;
 import java.util.List;
 
 /**
@@ -66,11 +62,11 @@ public class ControlPacketEncoder implements ChannelDownstreamHandler {
                 Channels.write(ctx, e.getFuture(), ((ControlPacket) e.getMessage()).encode(), e.getRemoteAddress());
             } else if (e.getMessage() instanceof CompoundControlPacket) {
                 List<ControlPacket> packets = ((CompoundControlPacket) e.getMessage()).getControlPackets();
-                ChannelBuffer[] buffers = new ChannelBuffer[packets.size()];
+                ByteBuf[] buffers = new ByteBuf[packets.size()];
                 for (int i = 0; i < buffers.length; i++) {
                     buffers[i] = packets.get(i).encode();
                 }
-                ChannelBuffer compoundBuffer = ChannelBuffers.wrappedBuffer(buffers);
+                ByteBuf compoundBuffer = Unpooled.wrappedBuffer(buffers);
                 Channels.write(ctx, e.getFuture(), compoundBuffer, e.getRemoteAddress());
             }
         } catch (Exception e1) {

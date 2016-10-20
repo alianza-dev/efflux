@@ -39,22 +39,15 @@ import com.biasedbit.efflux.participant.ParticipantDatabase;
 import com.biasedbit.efflux.participant.ParticipantOperation;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import com.biasedbit.efflux.participant.RtpParticipantInfo;
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.DatagramChannel;
-import org.jboss.netty.channel.socket.DatagramChannelFactory;
-import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
-import org.jboss.netty.channel.socket.oio.OioDatagramChannelFactory;
-import org.jboss.netty.handler.execution.ExecutionHandler;
-import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timeout;
-import org.jboss.netty.util.TimerTask;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+import io.netty.util.TimerTask;
+import io.netty.util.concurrent.EventExecutor;
 
 import java.net.SocketAddress;
+import java.nio.channels.Channels;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -95,7 +88,7 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
     protected final String id;
     protected final Set<Integer> payloadTypes = new HashSet<Integer>();
     protected final HashedWheelTimer timer;
-    protected final OrderedMemoryAwareThreadPoolExecutor executor;
+    protected final EventExecutor executor;
     protected String host;
     protected boolean useNio;
     protected boolean discardOutOfOrder;
@@ -139,17 +132,17 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
     }
 
     public AbstractRtpSession(String id, int payloadType, RtpParticipant local,
-                              OrderedMemoryAwareThreadPoolExecutor executor) {
+                              EventExecutor executor) {
         this(id, payloadType, local, null, executor);
     }
     
     public AbstractRtpSession(String id, int payloadType, RtpParticipant local, HashedWheelTimer timer,
-    		OrderedMemoryAwareThreadPoolExecutor executor) {
+                              EventExecutor executor) {
     	this(id, Collections.singleton(payloadType), local, timer, executor);
     }
     
     public AbstractRtpSession(String id, Collection<Integer> payloadTypes , RtpParticipant local, HashedWheelTimer timer,
-                              OrderedMemoryAwareThreadPoolExecutor executor) {
+                              EventExecutor executor) {
     	for (int payloadType : payloadTypes) {
     		if ((payloadType < 0) || (payloadType > 127)) {
     			throw new IllegalArgumentException("PayloadTypes must be in range [0;127]");
