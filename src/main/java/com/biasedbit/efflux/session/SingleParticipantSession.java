@@ -22,12 +22,11 @@ import com.biasedbit.efflux.packet.DataPacket;
 import com.biasedbit.efflux.participant.ParticipantDatabase;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import com.biasedbit.efflux.participant.SingleParticipantDatabase;
-import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
-import org.jboss.netty.util.HashedWheelTimer;
+import io.netty.util.HashedWheelTimer;
 
 import java.net.SocketAddress;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,29 +69,17 @@ public class SingleParticipantSession extends AbstractRtpSession {
 
     public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
                                     RtpParticipant remoteParticipant) {
-        this(id, payloadType, localParticipant, remoteParticipant, null, null);
-    }
-
-    public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                    RtpParticipant remoteParticipant, OrderedMemoryAwareThreadPoolExecutor executor) {
-        this(id, payloadType, localParticipant, remoteParticipant, null, executor);
+        this(id, payloadType, localParticipant, remoteParticipant, null);
     }
 
     public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
                                     RtpParticipant remoteParticipant, HashedWheelTimer timer) {
-        this(id, payloadType, localParticipant, remoteParticipant, timer, null);
-    }
-    
-    public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-    								RtpParticipant remoteParticipant, HashedWheelTimer timer,
-    								OrderedMemoryAwareThreadPoolExecutor executor) {
-    	this(id, Collections.singleton(payloadType), localParticipant, remoteParticipant, timer, executor);
+        this(id, Collections.singleton(payloadType), localParticipant, remoteParticipant, timer);
     }
 
     public SingleParticipantSession(String id, Collection<Integer> payloadTypes, RtpParticipant localParticipant,
-                                    RtpParticipant remoteParticipant, HashedWheelTimer timer,
-                                    OrderedMemoryAwareThreadPoolExecutor executor) {
-        super(id, payloadTypes, localParticipant, timer, executor);
+                                    RtpParticipant remoteParticipant, HashedWheelTimer timer) {
+        super(id, payloadTypes, localParticipant, timer);
         if (!remoteParticipant.isReceiver()) {
             throw new IllegalArgumentException("Remote participant must be a receiver (data & control addresses set)");
         }
@@ -179,7 +166,7 @@ public class SingleParticipantSession extends AbstractRtpSession {
             this.sentOrReceivedPackets.set(true);
         } catch (Exception e) {
             LOG.error("Failed to send RTCP packet to {} in session with id {}.",
-                      this.receiver.getInfo(), this.id);
+                    this.receiver.getInfo(), this.id);
         }
     }
 
@@ -190,7 +177,7 @@ public class SingleParticipantSession extends AbstractRtpSession {
             this.sentOrReceivedPackets.set(true);
         } catch (Exception e) {
             LOG.error("Failed to send compound RTCP packet to {} in session with id {}.",
-                      this.receiver.getInfo(), this.id);
+                    this.receiver.getInfo(), this.id);
         }
     }
 
@@ -204,7 +191,7 @@ public class SingleParticipantSession extends AbstractRtpSession {
             LOG.trace("First packet received from remote source, updated SSRC to {}.", packet.getSsrc());
         } else if (this.ignoreFromUnknownSsrc && (packet.getSsrc() != this.receiver.getInfo().getSsrc())) {
             LOG.trace("Discarded packet from unexpected SSRC: {} (expected was {}).",
-                      packet.getSsrc(), this.receiver.getInfo().getSsrc());
+                    packet.getSsrc(), this.receiver.getInfo().getSsrc());
             return;
         }
 

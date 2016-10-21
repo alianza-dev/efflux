@@ -86,7 +86,7 @@ public class MultiParticipantSessionFunctionalTest {
                 // You can NEVER add the same participant to two distinct sessions otherwise you'll ruin it (as both
                 // will be messing in the same participant).
                 RtpParticipant participant = RtpParticipant
-                    .createReceiver(new RtpParticipantInfo(j), "127.0.0.1", 10000 + (j * 2), 20001 + (j * 2));
+                        .createReceiver(new RtpParticipantInfo(j), "127.0.0.1", 10000 + (j * 2), 20001 + (j * 2));
                 System.err.println("Adding " + participant + " to session " + this.sessions[i].getId());
                 assertTrue(this.sessions[i].addReceiver(participant));
             }

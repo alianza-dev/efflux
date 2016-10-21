@@ -20,13 +20,13 @@ import com.biasedbit.efflux.participant.DefaultParticipantDatabase;
 import com.biasedbit.efflux.participant.ParticipantDatabase;
 import com.biasedbit.efflux.participant.ParticipantEventListener;
 import com.biasedbit.efflux.participant.RtpParticipant;
-import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
-import org.jboss.netty.util.HashedWheelTimer;
+import io.netty.util.HashedWheelTimer;
+
 import java.util.Collection;
 
 /**
  * A regular RTP session, as described in RFC3550.
- *
+ * <p>
  * Unlike {@link SingleParticipantSession}, this session starts off with 0 remote participants.
  *
  * @author <a:mailto="bruno.carvalho@wit-software.com" />Bruno de Carvalho</a>
@@ -36,27 +36,17 @@ public class MultiParticipantSession extends AbstractRtpSession implements Parti
     // constructors ---------------------------------------------------------------------------------------------------
 
     public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant) {
-        super(id, payloadType, localParticipant, null, null);
+        super(id, payloadType, localParticipant, null);
     }
 
     public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
                                    HashedWheelTimer timer) {
-        super(id, payloadType, localParticipant, timer, null);
+        super(id, payloadType, localParticipant, timer);
     }
 
-    public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                   OrderedMemoryAwareThreadPoolExecutor executor) {
-        super(id, payloadType, localParticipant, null, executor);
-    }
-
-    public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                   HashedWheelTimer timer, OrderedMemoryAwareThreadPoolExecutor executor) {
-        super(id, payloadType, localParticipant, timer, executor);
-    }
-    
     public MultiParticipantSession(String id, Collection<Integer> payloadTypes, RtpParticipant localParticipant,
-    		HashedWheelTimer timer, OrderedMemoryAwareThreadPoolExecutor executor) {
-    	super(id, payloadTypes, localParticipant, timer, executor);
+                                   HashedWheelTimer timer) {
+        super(id, payloadTypes, localParticipant, timer);
     }
 
     // AbstractRtpSession ---------------------------------------------------------------------------------------------

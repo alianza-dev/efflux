@@ -17,11 +17,12 @@
 package com.biasedbit.efflux.packet;
 
 import com.biasedbit.efflux.util.ByteUtils;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author <a href="mailto:bruno.carvalho@wit-software.com">Bruno de Carvalho</a>
@@ -31,9 +32,9 @@ public class ByePacketTest {
     @Test
     public void testDecode() throws Exception {
         // wireshark capture, X-lite
-        byte [] packetBytes = ByteUtils.convertHexStringToByteArray("81cb0001e6aa996e");
+        byte[] packetBytes = ByteUtils.convertHexStringToByteArray("81cb0001e6aa996e");
 
-        ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(packetBytes);
+        ByteBuf buffer = Unpooled.wrappedBuffer(packetBytes);
         ControlPacket controlPacket = ControlPacket.decode(buffer);
 
         assertEquals(ControlPacket.Type.BYE, controlPacket.getType());
@@ -51,9 +52,9 @@ public class ByePacketTest {
     public void testDecode2() throws Exception {
         // wireshark capture, jlibrtp
         byte[] packetBytes = ByteUtils.convertHexStringToByteArray("81cb000a4f52eb38156a6c69627274702073617973206279" +
-                                                                   "6520627965210000000000000000000000000000");
+                "6520627965210000000000000000000000000000");
 
-        ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(packetBytes);
+        ByteBuf buffer = Unpooled.wrappedBuffer(packetBytes);
         ControlPacket controlPacket = ControlPacket.decode(buffer);
 
         assertEquals(ControlPacket.Type.BYE, controlPacket.getType());
@@ -74,7 +75,7 @@ public class ByePacketTest {
         packet.addSsrc(0x46);
         packet.setReasonForLeaving("So long, cruel world.");
 
-        ChannelBuffer buffer = packet.encode();
+        ByteBuf buffer = packet.encode();
         assertEquals(36, buffer.readableBytes());
         System.out.println(ByteUtils.writeArrayAsHex(buffer.array(), true));
         assertEquals(0, buffer.readableBytes() % 4);
@@ -99,7 +100,7 @@ public class ByePacketTest {
         packet.addSsrc(0x46);
         packet.setReasonForLeaving("So long, cruel world.");
 
-        ChannelBuffer buffer = packet.encode(0, 64);
+        ByteBuf buffer = packet.encode(0, 64);
         assertEquals(64, buffer.readableBytes());
         byte[] bufferArray = buffer.array();
         System.out.println(ByteUtils.writeArrayAsHex(bufferArray, true));
@@ -127,7 +128,7 @@ public class ByePacketTest {
         packet.addSsrc(0x46);
         packet.setReasonForLeaving("So long, cruel world.");
 
-        ChannelBuffer buffer = packet.encode(60, 64);
+        ByteBuf buffer = packet.encode(60, 64);
         // Alignment would be to 128 bytes *with* the other RTCP packets. So this packet is sized at 128 - 60 = 68
         assertEquals(68, buffer.readableBytes());
         byte[] bufferArray = buffer.array();

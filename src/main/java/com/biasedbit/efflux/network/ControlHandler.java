@@ -18,17 +18,15 @@ package com.biasedbit.efflux.network;
 
 import com.biasedbit.efflux.logging.Logger;
 import com.biasedbit.efflux.packet.CompoundControlPacket;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class ControlHandler extends SimpleChannelUpstreamHandler {
+public class ControlHandler extends ChannelInboundHandlerAdapter {
 
     // constants ------------------------------------------------------------------------------------------------------
 
@@ -46,21 +44,21 @@ public class ControlHandler extends SimpleChannelUpstreamHandler {
         this.counter = new AtomicInteger();
     }
 
-    // SimpleChannelUpstreamHandler -----------------------------------------------------------------------------------
+    // ChannelInboundHandlerAdapter -----------------------------------------------------------------------------------
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        if (e.getMessage() instanceof CompoundControlPacket) {
-            this.receiver.controlPacketReceived(e.getRemoteAddress(), (CompoundControlPacket) e.getMessage());
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg instanceof CompoundControlPacket) {
+            this.receiver.controlPacketReceived(ctx.channel().remoteAddress(), (CompoundControlPacket) msg);
         }
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         // Just log and proceed...
-        LOG.error("Caught exception on channel {}.", e.getCause(), e.getChannel());
+        LOG.error("Caught exception on channel {}.", cause.getCause(), ctx.channel());
     }
-    
+
     // public methods -------------------------------------------------------------------------------------------------
 
     public int getPacketsReceived() {

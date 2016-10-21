@@ -17,8 +17,8 @@
 package com.biasedbit.efflux.packet;
 
 import com.biasedbit.efflux.util.ByteUtils;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -32,10 +32,10 @@ public class SenderReportPacketTest {
     public void testDecode() throws Exception {
         // wireshark capture, from X-lite
         byte[] packetBytes = ByteUtils.convertHexStringToByteArray("80c800064f52eb38d01f84417f3b6459a91e7bd9000000020" +
-                                                                   "0000002");
+                "0000002");
 
 
-        ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(packetBytes);
+        ByteBuf buffer = Unpooled.wrappedBuffer(packetBytes);
         ControlPacket controlPacket = ControlPacket.decode(buffer);
 
         assertEquals(ControlPacket.Type.SENDER_REPORT, controlPacket.getType());
@@ -56,9 +56,9 @@ public class SenderReportPacketTest {
     public void testDecode2() throws Exception {
         // wireshark capture, from jlibrtp
         byte[] packetBytes = ByteUtils.convertHexStringToByteArray("80c80006e6aa996ed01f84481be76c8b001bb2b40000020b0" +
-                                                                   "0015f64");
+                "0015f64");
 
-        ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(packetBytes);
+        ByteBuf buffer = Unpooled.wrappedBuffer(packetBytes);
         ControlPacket controlPacket = ControlPacket.decode(buffer);
 
         assertEquals(ControlPacket.Type.SENDER_REPORT, controlPacket.getType());
@@ -100,7 +100,7 @@ public class SenderReportPacketTest {
         block.setExtendedHighestSequenceNumberReceived(25);
         packet.addReceptionReportBlock(block);
 
-        ChannelBuffer encoded = packet.encode();
+        ByteBuf encoded = packet.encode();
         assertEquals(0, encoded.readableBytes() % 4);
 
         ControlPacket controlPacket = ControlPacket.decode(encoded);
