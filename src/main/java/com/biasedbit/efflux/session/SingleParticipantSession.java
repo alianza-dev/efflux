@@ -23,7 +23,6 @@ import com.biasedbit.efflux.participant.ParticipantDatabase;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import com.biasedbit.efflux.participant.SingleParticipantDatabase;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.concurrent.EventExecutor;
 
 import java.net.SocketAddress;
 import java.util.Collection;
@@ -70,29 +69,17 @@ public class SingleParticipantSession extends AbstractRtpSession {
 
     public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
                                     RtpParticipant remoteParticipant) {
-        this(id, payloadType, localParticipant, remoteParticipant, null, null);
-    }
-
-    public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                    RtpParticipant remoteParticipant, EventExecutor executor) {
-        this(id, payloadType, localParticipant, remoteParticipant, null, executor);
+        this(id, payloadType, localParticipant, remoteParticipant, null);
     }
 
     public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
                                     RtpParticipant remoteParticipant, HashedWheelTimer timer) {
-        this(id, payloadType, localParticipant, remoteParticipant, timer, null);
-    }
-
-    public SingleParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                    RtpParticipant remoteParticipant, HashedWheelTimer timer,
-                                    EventExecutor executor) {
-        this(id, Collections.singleton(payloadType), localParticipant, remoteParticipant, timer, executor);
+        this(id, Collections.singleton(payloadType), localParticipant, remoteParticipant, timer);
     }
 
     public SingleParticipantSession(String id, Collection<Integer> payloadTypes, RtpParticipant localParticipant,
-                                    RtpParticipant remoteParticipant, HashedWheelTimer timer,
-                                    EventExecutor executor) {
-        super(id, payloadTypes, localParticipant, timer, executor);
+                                    RtpParticipant remoteParticipant, HashedWheelTimer timer) {
+        super(id, payloadTypes, localParticipant, timer);
         if (!remoteParticipant.isReceiver()) {
             throw new IllegalArgumentException("Remote participant must be a receiver (data & control addresses set)");
         }

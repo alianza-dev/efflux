@@ -173,7 +173,7 @@ public class SingleParticipantSessionFunctionalTest {
                     return false;
                 }
 
-                packet.setPayloadType(this.payloadType);
+                packet.setPayloadType(this.getPayloadType().iterator().next());
                 // explicitly commented this one out to allow SSRC override!
                 //packet.setSsrc(this.localParticipant.getSsrc());
                 packet.setSequenceNumber(this.sequence.incrementAndGet());

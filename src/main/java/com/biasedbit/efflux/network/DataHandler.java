@@ -19,13 +19,14 @@ package com.biasedbit.efflux.network;
 import com.biasedbit.efflux.logging.Logger;
 import com.biasedbit.efflux.packet.DataPacket;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class DataHandler extends SimpleChannelUpstreamHandler {
+public class DataHandler extends ChannelInboundHandlerAdapter {
 
     // constants ------------------------------------------------------------------------------------------------------
 
@@ -43,19 +44,20 @@ public class DataHandler extends SimpleChannelUpstreamHandler {
         this.counter = new AtomicInteger();
     }
 
-    // SimpleChannelUpstreamHandler -----------------------------------------------------------------------------------
+    // ChannelInboundHandlerAdapter -----------------------------------------------------------------------------------
+
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        if (e.getMessage() instanceof DataPacket) {
-            this.receiver.dataPacketReceived(e.getRemoteAddress(), (DataPacket) e.getMessage());
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg instanceof DataPacket) {
+            this.receiver.dataPacketReceived(ctx.channel().remoteAddress(), (DataPacket) msg);
         }
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         // Just log and proceed...
-        LOG.error("Caught exception on channel {}.", e.getCause(), e.getChannel());
+        LOG.error("Caught exception on channel {}.", cause.getCause(), ctx.channel());
     }
 
     // public methods -------------------------------------------------------------------------------------------------

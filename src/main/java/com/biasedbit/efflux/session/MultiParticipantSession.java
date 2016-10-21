@@ -21,7 +21,6 @@ import com.biasedbit.efflux.participant.ParticipantDatabase;
 import com.biasedbit.efflux.participant.ParticipantEventListener;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.concurrent.EventExecutor;
 
 import java.util.Collection;
 
@@ -37,27 +36,17 @@ public class MultiParticipantSession extends AbstractRtpSession implements Parti
     // constructors ---------------------------------------------------------------------------------------------------
 
     public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant) {
-        super(id, payloadType, localParticipant, null, null);
+        super(id, payloadType, localParticipant, null);
     }
 
     public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
                                    HashedWheelTimer timer) {
-        super(id, payloadType, localParticipant, timer, null);
-    }
-
-    public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                   EventExecutor executor) {
-        super(id, payloadType, localParticipant, null, executor);
-    }
-
-    public MultiParticipantSession(String id, int payloadType, RtpParticipant localParticipant,
-                                   HashedWheelTimer timer, EventExecutor executor) {
-        super(id, payloadType, localParticipant, timer, executor);
+        super(id, payloadType, localParticipant, timer);
     }
 
     public MultiParticipantSession(String id, Collection<Integer> payloadTypes, RtpParticipant localParticipant,
-                                   HashedWheelTimer timer, EventExecutor executor) {
-        super(id, payloadTypes, localParticipant, timer, executor);
+                                   HashedWheelTimer timer) {
+        super(id, payloadTypes, localParticipant, timer);
     }
 
     // AbstractRtpSession ---------------------------------------------------------------------------------------------

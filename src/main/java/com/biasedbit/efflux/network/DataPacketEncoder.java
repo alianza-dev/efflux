@@ -17,16 +17,21 @@
 package com.biasedbit.efflux.network;
 
 import com.biasedbit.efflux.packet.DataPacket;
-import io.netty.buffer.ByteBuf;
+import io.netty.channel.AddressedEnvelope;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.channel.socket.DatagramPacket;
+import io.netty.handler.codec.MessageToMessageEncoder;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.List;
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
 @ChannelHandler.Sharable
-public class DataPacketEncoder extends MessageToByteEncoder<Object> {
+public class DataPacketEncoder extends MessageToMessageEncoder<AddressedEnvelope<DataPacket, SocketAddress>> {
 
     // constructors ---------------------------------------------------------------------------------------------------
 
@@ -39,19 +44,15 @@ public class DataPacketEncoder extends MessageToByteEncoder<Object> {
         return InstanceHolder.INSTANCE;
     }
 
-    // MessageToByteEncoder -------------------------------------------------------------------------------------------
+    // MessageToMessageEncoder ----------------------------------------------------------------------------------------
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        if (!(msg instanceof DataPacket)) {
-            return;
-        }
-
-        DataPacket packet = (DataPacket) msg;
+    protected void encode(ChannelHandlerContext ctx, AddressedEnvelope<DataPacket, SocketAddress> msg, List<Object> out) throws Exception {
+        DataPacket packet = msg.content();
         if (packet.getDataSize() == 0) {
             return;
         }
-        out.writeBytes(packet.encode());
+        out.add(new DatagramPacket(packet.encode(), (InetSocketAddress) msg.recipient()));
     }
 
     // private classes ------------------------------------------------------------------------------------------------

@@ -16,12 +16,7 @@
 
 package com.biasedbit.efflux.session;
 
-import com.biasedbit.efflux.packet.AppDataPacket;
-import com.biasedbit.efflux.packet.ByePacket;
-import com.biasedbit.efflux.packet.CompoundControlPacket;
-import com.biasedbit.efflux.packet.SdesChunk;
-import com.biasedbit.efflux.packet.SdesChunkItems;
-import com.biasedbit.efflux.packet.SourceDescriptionPacket;
+import com.biasedbit.efflux.packet.*;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import com.biasedbit.efflux.participant.RtpParticipantInfo;
 import org.junit.After;

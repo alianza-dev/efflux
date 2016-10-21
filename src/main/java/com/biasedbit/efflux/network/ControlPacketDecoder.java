@@ -19,42 +19,35 @@ package com.biasedbit.efflux.network;
 import com.biasedbit.efflux.logging.Logger;
 import com.biasedbit.efflux.packet.CompoundControlPacket;
 import com.biasedbit.efflux.packet.ControlPacket;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
-import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class ControlPacketDecoder implements ChannelUpstreamHandler {
+public class ControlPacketDecoder extends ChannelInboundHandlerAdapter {
 
     // constants ------------------------------------------------------------------------------------------------------
 
     protected static final Logger LOG = Logger.getLogger(ControlPacketDecoder.class);
 
-    // ChannelUpstreamHandler -----------------------------------------------------------------------------------------
+    // ChannelInboundHandlerAdapter -----------------------------------------------------------------------------------
 
-    public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent evt) throws Exception {
-        // Only handle MessageEvent.
-        if (!(evt instanceof MessageEvent)) {
-            ctx.sendUpstream(evt);
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // Only read ByteBuf.
+        if (!(msg instanceof ByteBuf)) {
             return;
         }
 
-        // Only decode if it's a ByteBuf.
-        MessageEvent e = (MessageEvent) evt;
-        if (!(e.getMessage() instanceof ByteBuf)) {
-            return;
-        }
-
-        ByteBuf buffer = (ByteBuf) e.getMessage();
+        ByteBuf buffer = (ByteBuf) msg;
         if ((buffer.readableBytes() % 4) != 0) {
             LOG.debug("Invalid RTCP packet received: total length should be multiple of 4 but is {}",
-                      buffer.readableBytes());
+                    buffer.readableBytes());
             return;
         }
 
@@ -73,7 +66,7 @@ public class ControlPacketDecoder implements ChannelUpstreamHandler {
         if (!controlPacketList.isEmpty()) {
             // Only send upwards when there were more than one valid decoded packets.
             // TODO shouldn't the whole compound packet be discarded when one of them has errors?!
-            Channels.fireMessageReceived(ctx, new CompoundControlPacket(controlPacketList), e.getRemoteAddress());
+            ctx.fireChannelRead(new CompoundControlPacket(controlPacketList));
         }
     }
 }

@@ -29,22 +29,20 @@ import java.util.List;
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class DataPacketDecoder extends ByteToMessageDecoder {
+public class DataPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     // constants ------------------------------------------------------------------------------------------------------
 
-    protected static final Logger LOG = Logger.getLogger(MessageToMessageDecoder.class);
+    protected static final Logger LOG = Logger.getLogger(ByteToMessageDecoder.class);
 
-    // ByteToMessageDecoder -------------------------------------------------------------------------------------------
+    // MessageToMessageDecoder ----------------------------------------------------------------------------------------
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         try {
-            out.add(DataPacket.decode(in));
-            return;
+            out.add(DataPacket.decode(msg));
         } catch (Exception e) {
             LOG.debug("Failed to decode RTP packet.", e);
-            return;
         }
     }
 }

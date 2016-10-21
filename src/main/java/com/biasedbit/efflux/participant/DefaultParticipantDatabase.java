@@ -23,12 +23,7 @@ import com.biasedbit.efflux.packet.SdesChunkItem;
 import com.biasedbit.efflux.util.TimeUtils;
 
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -139,7 +134,7 @@ public class DefaultParticipantDatabase implements ParticipantDatabase {
             for (RtpParticipant member : this.members.values()) {
                 boolean sameDestinationAddresses =
                         member.getDataDestination().equals(remoteParticipant.getDataDestination()) &&
-                        member.getControlDestination().equals(remoteParticipant.getControlDestination());
+                                member.getControlDestination().equals(remoteParticipant.getControlDestination());
                 boolean sameCname = member.getInfo().getCname().equals(remoteParticipant.getInfo().getCname());
                 if (sameDestinationAddresses || sameCname) {
                     // Instead of adding the newly provided participant, reuse the member
@@ -287,7 +282,7 @@ public class DefaultParticipantDatabase implements ParticipantDatabase {
                 if (participant.receivedBye() && TimeUtils
                         .hasExpired(now, participant.getLastReceptionInstant(), timeout)) {
                     LOG.trace("Removed {} from session with id '{}' after reception of BYE and {}s of inactivity.",
-                              participant, this.id, this.timeoutAfterByeAndNoPacketsReceived);
+                            participant, this.id, this.timeoutAfterByeAndNoPacketsReceived);
                     iterator.remove();
                     if (participant.isReceiver()) {
                         this.receivers.remove(participant);
