@@ -50,14 +50,14 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof DataPacket) {
-            this.receiver.dataPacketReceived(ctx.channel().remoteAddress(), (DataPacket) msg);
+            this.receiver.dataPacketReceived(((DataPacket) msg).getRemoteAddress(), (DataPacket) msg);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         // Just log and proceed...
-        LOG.error("Caught exception on channel {}.", cause.getCause(), ctx.channel());
+        LOG.error("Caught exception on channel {}.", ctx.channel(), cause);
     }
 
     // public methods -------------------------------------------------------------------------------------------------

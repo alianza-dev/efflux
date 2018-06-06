@@ -23,7 +23,12 @@ import com.biasedbit.efflux.packet.SdesChunkItem;
 import com.biasedbit.efflux.util.TimeUtils;
 
 import java.net.SocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -191,7 +196,7 @@ public class DefaultParticipantDatabase implements ParticipantDatabase {
 
                 boolean created = false;
                 if (!isReceiver) {
-                    // Will be added to the members list but will NOT be a receiver. 
+                    // Will be added to the members list but will NOT be a receiver.
                     participant = RtpParticipant.createFromUnexpectedDataPacket(origin, packet);
                     created = true;
                 }

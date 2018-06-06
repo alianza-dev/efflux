@@ -21,7 +21,8 @@ import com.biasedbit.efflux.packet.CompoundControlPacket;
 import com.biasedbit.efflux.packet.ControlPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.DatagramPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class ControlPacketDecoder extends ChannelInboundHandlerAdapter {
+public class ControlPacketDecoder extends SimpleChannelInboundHandler<DatagramPacket> {
 
     // constants ------------------------------------------------------------------------------------------------------
 
@@ -38,16 +39,11 @@ public class ControlPacketDecoder extends ChannelInboundHandlerAdapter {
     // ChannelInboundHandlerAdapter -----------------------------------------------------------------------------------
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        // Only read ByteBuf.
-        if (!(msg instanceof ByteBuf)) {
-            return;
-        }
-
-        ByteBuf buffer = (ByteBuf) msg;
+    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
+        ByteBuf buffer = msg.content();
         if ((buffer.readableBytes() % 4) != 0) {
             LOG.debug("Invalid RTCP packet received: total length should be multiple of 4 but is {}",
-                    buffer.readableBytes());
+                      buffer.readableBytes());
             return;
         }
 
@@ -57,7 +53,11 @@ public class ControlPacketDecoder extends ChannelInboundHandlerAdapter {
         // While there's data to read, keep on decoding.
         while (buffer.readableBytes() > 0) {
             try {
-                controlPacketList.add(ControlPacket.decode(buffer));
+                final ControlPacket packet = ControlPacket.decode(buffer);
+                if (packet != null) {
+                    packet.setRemoteAddress(msg.sender());
+                    controlPacketList.add(packet);
+                }
             } catch (Exception e1) {
                 LOG.debug("Exception caught while decoding RTCP packet.", e1);
             }

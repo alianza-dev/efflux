@@ -21,7 +21,7 @@ import io.netty.buffer.ByteBuf;
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public abstract class ControlPacket {
+public abstract class ControlPacket extends DatagramPacket {
 
     // internal vars --------------------------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ public abstract class ControlPacket {
 
         // No need to pass version downwards, only V2 is supported so subclasses can safely assume V2.
         // I know it's ugly when the superclass knows about the subclasses but since this method is static (and NEEDS
-        // to be) the alternative was having this method in a external class. Pointless. 
+        // to be) the alternative was having this method in a external class. Pointless.
         switch (type) {
             case SENDER_REPORT:
                 return SenderReportPacket.decode(buffer, hasPadding, innerBlocks, length);

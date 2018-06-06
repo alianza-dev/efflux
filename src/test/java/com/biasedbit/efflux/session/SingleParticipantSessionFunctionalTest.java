@@ -26,7 +26,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
@@ -48,7 +51,7 @@ public class SingleParticipantSessionFunctionalTest {
     }
 
     @Test
-    public void testSendAndReceive() {
+    public void testSendAndReceive() throws Exception {
         final CountDownLatch latch = new CountDownLatch(2);
 
         RtpParticipant local1 = RtpParticipant.createReceiver(new RtpParticipantInfo(1), "127.0.0.1", 6000, 6001);
@@ -82,11 +85,7 @@ public class SingleParticipantSessionFunctionalTest {
         packet.setSequenceNumber(2);
         assertTrue(this.session2.sendDataPacket(packet));
 
-        try {
-            assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
-        } catch (Exception e) {
-            fail("Exception caught: " + e.getClass().getSimpleName() + " - " + e.getMessage());
-        }
+        assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
     }
 
     @Test

@@ -56,7 +56,7 @@ public class ControlHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         // Just log and proceed...
-        LOG.error("Caught exception on channel {}.", cause.getCause(), ctx.channel());
+        LOG.error("Caught exception on channel {}.", ctx.channel(), cause);
     }
 
     // public methods -------------------------------------------------------------------------------------------------

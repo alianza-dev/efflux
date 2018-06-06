@@ -18,29 +18,29 @@ package com.biasedbit.efflux.network;
 
 import com.biasedbit.efflux.logging.Logger;
 import com.biasedbit.efflux.packet.DataPacket;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
-
-import java.util.List;
 
 
 /**
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class DataPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
+public class DataPacketDecoder extends SimpleChannelInboundHandler<DatagramPacket> {
 
     // constants ------------------------------------------------------------------------------------------------------
 
     protected static final Logger LOG = Logger.getLogger(ByteToMessageDecoder.class);
 
-    // MessageToMessageDecoder ----------------------------------------------------------------------------------------
+    // SimpleChannelInboundHandler ----------------------------------------------------------------------------------------
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
         try {
-            out.add(DataPacket.decode(msg));
+            final DataPacket packet = DataPacket.decode(msg.content());
+            packet.setRemoteAddress(msg.sender());
+            ctx.fireChannelRead(packet);
         } catch (Exception e) {
             LOG.debug("Failed to decode RTP packet.", e);
         }

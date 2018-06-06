@@ -17,14 +17,35 @@
 package com.biasedbit.efflux.session;
 
 import com.biasedbit.efflux.logging.Logger;
-import com.biasedbit.efflux.network.*;
-import com.biasedbit.efflux.packet.*;
+import com.biasedbit.efflux.network.ControlHandler;
+import com.biasedbit.efflux.network.ControlPacketDecoder;
+import com.biasedbit.efflux.network.ControlPacketEncoder;
+import com.biasedbit.efflux.network.DataHandler;
+import com.biasedbit.efflux.network.DataPacketDecoder;
+import com.biasedbit.efflux.network.DataPacketEncoder;
+import com.biasedbit.efflux.packet.AbstractReportPacket;
+import com.biasedbit.efflux.packet.AppDataPacket;
+import com.biasedbit.efflux.packet.ByePacket;
+import com.biasedbit.efflux.packet.CompoundControlPacket;
+import com.biasedbit.efflux.packet.ControlPacket;
+import com.biasedbit.efflux.packet.DataPacket;
+import com.biasedbit.efflux.packet.ReceiverReportPacket;
+import com.biasedbit.efflux.packet.ReceptionReport;
+import com.biasedbit.efflux.packet.SdesChunk;
+import com.biasedbit.efflux.packet.SdesChunkItems;
+import com.biasedbit.efflux.packet.SenderReportPacket;
+import com.biasedbit.efflux.packet.SourceDescriptionPacket;
 import com.biasedbit.efflux.participant.ParticipantDatabase;
 import com.biasedbit.efflux.participant.ParticipantOperation;
 import com.biasedbit.efflux.participant.RtpParticipant;
 import com.biasedbit.efflux.participant.RtpParticipantInfo;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.DefaultAddressedEnvelope;
+import io.netty.channel.DefaultMessageSizeEstimator;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
@@ -35,7 +56,12 @@ import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 
 import java.net.SocketAddress;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -303,7 +329,7 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
     public boolean sendControlPacket(ControlPacket packet) {
         // Only allow sending explicit RTCP packets if all the following conditions are met:
         // 1. session is running
-        // 2. automated rtcp handling is disabled (except for APP_DATA packets) 
+        // 2. automated rtcp handling is disabled (except for APP_DATA packets)
         if (!this.running.get()) {
             return false;
         }

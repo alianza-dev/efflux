@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
-public class DataPacket {
+public class DataPacket extends DatagramPacket {
 
     // internal vars --------------------------------------------------------------------------------------------------
 
