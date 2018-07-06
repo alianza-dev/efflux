@@ -10,11 +10,11 @@
 
     <groupId>com.alianza.qa</groupId>
     <artifactId>efflux</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/alianza-dev/efflux.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>v1.0.1</tag>
   </scm>
 
     <dependencies>
