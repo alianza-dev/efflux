@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -137,10 +138,9 @@ public class DefaultParticipantDatabase implements ParticipantDatabase {
             // Iterate through the members, trying to find a match for this participant through the RTP ports or CNAME.
             boolean isMember = false;
             for (RtpParticipant member : this.members.values()) {
-                boolean sameDestinationAddresses =
-                        member.getDataDestination().equals(remoteParticipant.getDataDestination()) &&
-                                member.getControlDestination().equals(remoteParticipant.getControlDestination());
-                boolean sameCname = member.getInfo().getCname().equals(remoteParticipant.getInfo().getCname());
+                boolean sameDestinationAddresses = Objects.equals(member.getDataDestination(), remoteParticipant.getDataDestination()) &&
+                        Objects.equals(member.getControlDestination(), remoteParticipant.getControlDestination());
+                boolean sameCname = Objects.equals(member.getInfo().getCname(), remoteParticipant.getInfo().getCname());
                 if (sameDestinationAddresses || sameCname) {
                     // Instead of adding the newly provided participant, reuse the member
                     this.receivers.add(member);
