@@ -39,6 +39,8 @@ public interface RtpSession extends DataPacketReceiver, ControlPacketReceiver {
 
     void terminate();
 
+    void terminateNow();
+
     boolean sendData(byte[] data, long timestamp, boolean marked);
 
     boolean sendDataPacket(DataPacket packet);
