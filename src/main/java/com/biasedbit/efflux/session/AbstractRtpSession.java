@@ -292,7 +292,12 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
 
     @Override
     public void terminate() {
-        this.terminate(RtpSessionEventListener.TERMINATE_CALLED);
+        this.terminate(RtpSessionEventListener.TERMINATE_CALLED, true);
+    }
+
+    @Override
+    public void terminateNow() {
+        this.terminate(RtpSessionEventListener.TERMINATE_CALLED, false);
     }
 
     @Override
@@ -424,10 +429,10 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
         if (packet.getSsrc() == this.localParticipant.getSsrc()) {
             // Sending data to ourselves? Consider this a loop and bail out!
             if (origin.equals(this.localParticipant.getDataDestination())) {
-                this.terminate(new Throwable("Loop detected: session is directly receiving its own packets"));
+                this.terminate(new Throwable("Loop detected: session is directly receiving its own packets"), true);
                 return;
             } else if (this.collisions.incrementAndGet() > this.maxCollisionsBeforeConsideringLoop) {
-                this.terminate(new Throwable("Loop detected after " + this.collisions.get() + " SSRC collisions"));
+                this.terminate(new Throwable("Loop detected after " + this.collisions.get() + " SSRC collisions"), true);
                 return;
             }
 
@@ -802,7 +807,7 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
         return sdesPacket;
     }
 
-    protected synchronized void terminate(Throwable cause) {
+    protected synchronized void terminate(Throwable cause, boolean graceful) {
         // Always set to false, even it if was already set at false.
         if (!this.running.getAndSet(false)) {
             return;
@@ -820,8 +825,14 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
         this.leaveSession(this.localParticipant.getSsrc(), "Session terminated.");
         this.controlChannel.close();
 
-        this.dataGroup.shutdownGracefully().syncUninterruptibly();
-        this.controlGroup.shutdownGracefully().syncUninterruptibly();
+        if (graceful) {
+            this.dataGroup.shutdownGracefully().syncUninterruptibly();
+            this.controlGroup.shutdownGracefully().syncUninterruptibly();
+        } else {
+            this.dataGroup.shutdownNow();
+            this.controlGroup.shutdownNow();
+        }
+
         LOG.debug("RtpSession with id {} terminated.", this.id);
 
         for (RtpSessionEventListener listener : this.eventListeners) {
