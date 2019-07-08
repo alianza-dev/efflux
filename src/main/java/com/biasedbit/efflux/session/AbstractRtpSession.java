@@ -807,7 +807,7 @@ public abstract class AbstractRtpSession implements RtpSession, TimerTask {
         return sdesPacket;
     }
 
-    protected synchronized void terminate(Throwable cause, Boolean graceful) {
+    protected synchronized void terminate(Throwable cause, boolean graceful) {
         // Always set to false, even it if was already set at false.
         if (!this.running.getAndSet(false)) {
             return;
